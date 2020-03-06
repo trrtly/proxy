@@ -1,11 +1,11 @@
 package cache
 
-import "time"
-
 //Cache interface
 type Cache interface {
-	Get(key string) interface{}
-	Set(key string, val interface{}, timeout time.Duration) error
-	SAdd(key string) bool
-	SMembers(key string) interface{}
+	Get(key string) ([]byte, error)
+	SAdd(key string, values ...interface{}) (int, error)
+	SRem(key string, values ...interface{}) (int, error)
+	SMembers(key string) ([]string, error)
+	SRandMember(key string) (string, error)
+	SRandMembers(key string, count int) ([]string, error)
 }

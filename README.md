@@ -1,6 +1,6 @@
 # Esign SDK for Go
 
-使用Golang开发的E签宝SDK。
+使用Golang开发的代理ip池。
 
 ## 快速开始
 
@@ -23,8 +23,8 @@ es := esign.NewEsign(config)
 
 **Cache 设置**
 
-Cache主要用来保存全局access_token：
-默认采用memcache存储。也可以直接实现`cache/cache.go`中的接口
+Cache 主要用来缓存代理 ip 地址：
+默认采用 redis 存储。也可以直接实现`cache/cache.go`中的接口
 
 ## License
 

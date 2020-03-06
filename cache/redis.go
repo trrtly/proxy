@@ -1,7 +1,6 @@
 package cache
 
 import (
-	"encoding/json"
 	"time"
 
 	"github.com/gomodule/redigo/redis"
@@ -51,59 +50,49 @@ func (r *Redis) SetConn(conn *redis.Pool) {
 }
 
 //Get 获取一个值
-func (r *Redis) Get(key string) interface{} {
+func (r *Redis) Get(key string) ([]byte, error) {
 	conn := r.conn.Get()
 	defer conn.Close()
 
-	var data []byte
-	var err error
-	if data, err = redis.Bytes(conn.Do("GET", key)); err != nil {
-		return nil
-	}
-	var reply interface{}
-	if err = json.Unmarshal(data, &reply); err != nil {
-		return nil
-	}
-
-	return reply
+	return redis.Bytes(conn.Do("GET", key))
 }
 
-//Set 设置一个值
-func (r *Redis) Set(key string, val interface{}, timeout time.Duration) (err error) {
+//SAdd 向集合添加一个或多个值
+func (r *Redis) SAdd(key string, values ...interface{}) (int, error) {
 	conn := r.conn.Get()
 	defer conn.Close()
 
-	var data []byte
-	if data, err = json.Marshal(val); err != nil {
-		return
-	}
-
-	_, err = conn.Do("SETEX", key, int64(timeout/time.Second), data)
-
-	return
+	return redis.Int(conn.Do("SADD", append([]interface{}{key}, values...)...))
 }
 
-//IsExist 判断key是否存在
-func (r *Redis) IsExist(key string) bool {
+//SRem 移除集合中的一个或多个元素
+func (r *Redis) SRem(key string, values ...interface{}) (int, error) {
 	conn := r.conn.Get()
 	defer conn.Close()
 
-	a, _ := conn.Do("EXISTS", key)
-	i := a.(int64)
-	if i > 0 {
-		return true
-	}
-	return false
+	return redis.Int(conn.Do("SREM", append([]interface{}{key}, values...)...))
 }
 
-//Delete 删除
-func (r *Redis) Delete(key string) error {
+//SMembers 获取集合中的所有元素值
+func (r *Redis) SMembers(key string) ([]string, error) {
 	conn := r.conn.Get()
 	defer conn.Close()
 
-	if _, err := conn.Do("DEL", key); err != nil {
-		return err
-	}
+	return redis.Strings(conn.Do("SMEMBERS", key))
+}
 
-	return nil
+//SRandMember 随机获取集合中的一个元素
+func (r *Redis) SRandMember(key string) (string, error) {
+	conn := r.conn.Get()
+	defer conn.Close()
+
+	return redis.String(conn.Do("SRANDMEMBER", key))
+}
+
+//SRandMembers 随机获取集合中的多个元素
+func (r *Redis) SRandMembers(key string, count int) ([]string, error) {
+	conn := r.conn.Get()
+	defer conn.Close()
+
+	return redis.Strings(conn.Do("SRANDMEMBER", key, count))
 }
