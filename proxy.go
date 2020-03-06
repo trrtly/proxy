@@ -95,7 +95,7 @@ func (p *Proxy) recuCheckAddrs(count int8) {
 	if count > 3 {
 		return
 	}
-	time.Sleep(time.Millisecond*30)
+	time.Sleep(time.Millisecond*100)
 
 	p.recuCheckAddrs(count)
 }
@@ -125,7 +125,7 @@ func (p *Proxy) getRandomOneRecursive(count int) (string, error) {
 			return "", ErrNotFoundAddr
 		}
 		count++
-		p.getRandomOneRecursive(count)
+		return p.getRandomOneRecursive(count)
 	}
 	return addr, err
 }
