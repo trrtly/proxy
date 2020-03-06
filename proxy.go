@@ -125,7 +125,7 @@ func (p *Proxy) getRandomOneRecursive(count int) (string, error) {
 			return "", ErrNotFoundAddr
 		}
 		count++
-		p.getRandomOneRecursive(RecursiveFetchCount)
+		p.getRandomOneRecursive(count)
 	}
 	return addr, err
 }
